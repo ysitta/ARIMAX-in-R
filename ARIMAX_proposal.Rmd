@@ -1,0 +1,136 @@
+---
+title: "Forecasting using ARIMAX"
+author: "Sitta"
+date: "`r format(Sys.Date(), '%B %e, %Y')`"
+output: 
+  html_document:
+    df_print: paged
+    toc: true
+    toc_depth: 1
+    toc_float: true
+    theme: united
+    highlight: espresso
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE)
+```
+
+In the trend of big data, we often need to do the predictive analysis to help us make the decision. One of the important things to predict is the future based on our past and present data. This kind of prediction we are often called by forecasting. 
+
+Forecasting is required in many situations: deciding whether to build another power generation plant in the next five years requires forecasts of future demand; scheduling staff in a call centre next week requires forecasts of call volumes; stocking an inventory requires forecasts of stock requirements. The predictability of an event or a quantity depends on several factors including[^1]:
+
+- How well we understand the factors that contribute to it;
+- How much data is available;
+- Whether the forecasts can affect the thing we are trying to forecast.
+
+# About ARIMA
+
+Auto Regressive Integrated Moving Average (ARIMA)(p,d,q) is an extension version of Auto Regressive (AR), Moving Average (MA), and Auto Regressive Moving Average (ARMA) models[^2]. ARIMA models are the models that is applied to time series problems. ARIMA bind the three types of modeling processes into one modeling framework[^3]:   
+
+- **I**: The differencing is denoted by $d$. It tells us the number of differenced series changed between consecutive observations towards the original series.   
+- **AR**: The auto regressive is denoted by $p$. It tells us the number
+of lags required to fit an AR process to the stationary series. ACF and
+PACF help us identify the best set of parameters for the AR process.   
+- **MA**: The moving average order is denoted by $q$. It tells us the
+number of error terms in a series to be regressed to reduce the
+differenced AR process residual to white noise.   
+
+# About ARIMAX
+
+ARIMAX or Regression ARIMA is an extension of ARIMA model. In forecasting, this method involves independent variables also[^4]. The ARIMAX model represents a composition of the output time series into the following parts: the autoregressive (AR) part, moving average (MA) part, integrated (I) component, and the part that belongs to the exogenous inputs (X)[^5]. The exogenous part (X) reflects the additional incorporation of the present values $u_i(t)$ and past values $u_i(t-j)$ of exogenous inputs (dynamic factors in our case) into the ARIMAX model[^1].
+
+Multiple regression models formula:
+
+<center>
+
+$Y = \beta_0 + \beta_1*x_1+...+\beta_i*x_i$ 
+
+</center>
+
+Where $Y$ is a dependent variable of the $x_i$ predictor variables and $\varepsilon$ usually assumed to be an uncorrelated error term (i.e., it is white noise). We considered tests such as the Durbin-Watson test for assessing whether $\varepsilon$ was significantly correlated. We will replace $\varepsilon$ by nt in the equation. The error series $\phi_t$ is assumed to follow an ARIMA model. For example, if nt follows an ARIMA (1,1,1) model, we can write
+
+<center>
+
+$Y = \beta_0 + \beta_1x_1+\beta_2x_2+...+\beta_ix_i+\eta_t$   
+
+$(1-\phi_1B)(1-B)\eta_t = (1+\phi_1B)\varepsilon_t$
+
+</center>
+
+Where $\varepsilon_t$, is a white noise series. ARIMAX model have two error terms here the error from the regression model which we denote by $\phi_t$ and the error from the ARIMA model which we denote by $\varepsilon_t$. Only the ARIMA model errors are assumed to be
+white noise.
+
+
+# Case Studies
+
+```{r echo = FALSE}
+library(fpp2)
+```
+
+One of the case study that can be solved using ARIMAX is forecasting the Quarterly changes in US Consumption based on time and its personal income.
+
+```{r}
+autoplot(uschange[,1:2], facets=TRUE) +
+  xlab("Year") + ylab("") +
+  ggtitle("Quarterly changes in US consumption
+    and personal income")
+```
+
+
+# Potential uses
+
+The potential uses of ARIMAX models is wide. The one thing that should be remember is our data is observed sequentially overtime. Other than that, we know that the changes overtime is influenced by other factor. Hence, if we have sequentially data and predictors that influence it, we can use ARIMAX. Here are several use cases that has been done using ARIMAX:
+
+- Quarterly changes in US consumption and personal income[^1]   
+- TV advertising and insurance quotations[^1]    
+- Pest Incidence of Cotton with Weather Factors[^4]    
+- Forecasting container throughput[^5]    
+- etc
+
+# Comparison on other algorithms
+
+Is there any other algorithms as an option when we want to predict the US consumption even without ARIMAX?
+
+## Regression Model 
+
+We often predict the consumption based on its income using regression model. Multiple regression models formula:
+
+<center>
+
+$Y = \beta_0 + \beta_1*x_1 + ... + \beta_i*x_i+\varepsilon$
+
+</center>
+
+Where $Y$ is a dependent variable of the $x_i$ predictor variables and ɛ
+usually assumed to be an uncorrelated error term (i.e., it is white noise)
+
+By using this method we ignore the data that is observed sequentially over time.
+
+## ARIMA model
+
+By using ARIMA, we forecast the future only based on sequentially over time data. It ignore the other factor that might influence the changes in US consumption. The explanation about arima is stated on the above.
+
+# Advantages & Disadvantages
+
+To use the ARIMAX models, there are several advantages and disadvantages that might be face. The explanation of the advantages and the disadvantages is explained below.
+
+## Advantages
+
+The advantages od using ARIMAX is we can combine the regression and time series part in one model, named ARIMAX. This model can optimized our error compared to regression model or ARIMA models.
+
+## Disadvantages
+
+one disadvantage is that the covariate coefficient is hard to interpret. The value of slope is not the effect on $Y_t$ when the $x_t$ is increased by one (as it is in regression). The presence of lagged values of the response variable on the right hand side of the equation mean that the slope $\beta$ can only be interpreted conditional on the value of previous values of the response variable, which is hardly intuitive.[^6]
+
+# References
+
+[^1]: [Forecasting: Principles and Practice](https://otexts.com/fpp2/)
+[^2]: [Epidemiology and ARIMA model of positive-rate of influenza viruses among children in Wuhan, China: A nine-year retrospective study](https://www.sciencedirect.com/science/article/pii/S1201971218344618)
+[^3]: [Machine Learning using R](https://link.springer.com/book/10.1007%2F978-1-4842-4215-5)
+[^4]: [Comparison of Prediction Accuracy of Multiple Linear
+Regression, ARIMA and ARIMAX Model for Pest Incidence of Cotton with Weather Factors](http://masujournal.org/105/180151.pdf)
+[^5]: [Container Throughput Forecasting Using Dynamic Factor Analysis and ARIMAX Model](https://hrcak.srce.hr/index.php?show=clanak&id_clanak_jezik=278240&lang=en)
+[^6]: [The ARIMAX model muddle](https://robjhyndman.com/hyndsight/arimax/)
