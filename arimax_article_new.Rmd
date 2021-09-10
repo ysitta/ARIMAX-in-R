@@ -186,7 +186,10 @@ prediction_arima %>%
 
 ## Model Fitting dengan ARIMAX
 
-Kemudian kita akan mencoba melakukan fitting model ARIMAX dengan variabel dependen adalah tingkat konsumsi dan variabel independen adalah tingkat pendapatan, tingkat produksi, dana cadangan, dan tingkat pengangguran. Lalu kita akan mencoba membandingkan hasil dari model ARIMA dan ARIMAX
+Kemudian kita akan mencoba melakukan fitting model ARIMAX dengan variabel dependen adalah tingkat konsumsi dan variabel independen adalah tingkat pendapatan, tingkat produksi, dana cadangan, dan tingkat pengangguran. Lalu kita akan mencoba membandingkan hasil dari model ARIMA dan ARIMAX.
+
+Adapun apabila ingin forecasting, namun tidak memiliki nilai predictor di masa depan, bisa dilakukan forecasting terlebih dahulu ke prediktornya, kemudian dilakukan forecast terhadap variabel targetnya.
+
 ```{r}
 fit_arimax <- train %>%
   model(regarima = ARIMA(Consumption ~ Income + Production + Savings + Unemployment))
@@ -213,9 +216,6 @@ Berdasarkan kedua plot di atas model ARIMAX lebih bisa memprediksi pola Consumpt
 ```{r}
 print(paste("RMSE model ARIMA:", round(accuracy(object = prediction_arima, data = test)[2], 2)))
 print(paste("RMSE model ARIMAX:", round(forecast::accuracy(object = prediction_arimax, data = us_change)$RMSE, 2)))
-
-class(prediction_arimax)
-class(prediction_arima)
 ```
 
 Dari output di atas diketahui bahwa model ARIMAX menghasilkan error yang lebih kecil dibandingkan model ARIMA. Sehingga, final model yang akan digunakan adalah model ARIMAX. Model ARIMAX tersebut harus memenuhi beberapa asumsi supaya hasil yang peramalan data di masa depan bersifat BLUE (best, linier, unbiased, estimation)
